@@ -183,6 +183,9 @@ func (session *Session) Update(bean interface{}, condiBean ...interface{}) (int6
 		if session.statement.ColumnStr == "" {
 			colNames, args = session.statement.buildUpdates(bean, false, false,
 				false, false, true)
+			if session.statement.lastError != nil {
+				return 0, err
+			}
 		} else {
 			colNames, args, err = session.genUpdateColumns(bean)
 			if err != nil {
@@ -471,9 +474,9 @@ func (session *Session) genUpdateColumns(bean interface{}) ([]string, []interfac
 		if len(session.statement.columnMap) > 0 {
 			if !session.statement.columnMap.contain(col.Name) {
 				continue
-			} else if _, ok := session.statement.incrColumns[col.Name]; ok {
+			} else if _, ok := session.statement.incrColumns[strings.ToLower(col.Name)]; ok {
 				continue
-			} else if _, ok := session.statement.decrColumns[col.Name]; ok {
+			} else if _, ok := session.statement.decrColumns[strings.ToLower(col.Name)]; ok {
 				continue
 			}
 		}
