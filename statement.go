@@ -1105,7 +1105,7 @@ func (statement *Statement) genSelectSQL(columnStr, condSQL string, needLimit, n
 	if needLimit {
 		if dialect.DBType() == core.MSSQL {
 			if statement.Start > 0 {
-				fmt.Fprintf(&buf, "OFFSET %v ROWS FETCH NEXT %v ROWS ONLY", statement.Start, statement.LimitN)
+				fmt.Fprintf(&buf, " OFFSET %v ROWS FETCH NEXT %v ROWS ONLY", statement.Start, statement.LimitN)
 			}
 		}
 		if dialect.DBType() != core.MSSQL && dialect.DBType() != core.ORACLE {
