@@ -1081,41 +1081,6 @@ func (statement *Statement) genSelectSQL(columnStr, condSQL string, needLimit, n
 		if statement.LimitN > 0 {
 			top = fmt.Sprintf("TOP %d ", statement.LimitN)
 		}
-		if statement.Start > 0 {
-			var column string
-			if len(statement.RefTable.PKColumns()) == 0 {
-				for _, index := range statement.RefTable.Indexes {
-					if len(index.Cols) == 1 {
-						column = index.Cols[0]
-						break
-					}
-				}
-				if len(column) == 0 {
-					column = statement.RefTable.ColumnsSeq()[0]
-				}
-			} else {
-				column = statement.RefTable.PKColumns()[0].Name
-			}
-			if statement.needTableName() {
-				if len(statement.TableAlias) > 0 {
-					column = statement.TableAlias + "." + column
-				} else {
-					column = statement.TableName() + "." + column
-				}
-			}
-
-			var orderStr string
-			if needOrderBy && len(statement.OrderStr) > 0 {
-				orderStr = " ORDER BY " + statement.OrderStr
-			}
-
-			var groupStr string
-			if len(statement.GroupByStr) > 0 {
-				groupStr = " GROUP BY " + statement.GroupByStr
-			}
-			mssqlCondi = fmt.Sprintf("(%s NOT IN (SELECT TOP %d %s%s%s%s%s))",
-				column, statement.Start, column, fromStr, whereStr, orderStr, groupStr)
-		}
 	}
 
 	var buf builder.StringBuilder
@@ -1138,6 +1103,11 @@ func (statement *Statement) genSelectSQL(columnStr, condSQL string, needLimit, n
 		fmt.Fprint(&buf, " ORDER BY ", statement.OrderStr)
 	}
 	if needLimit {
+		if dialect.DBType() == core.MSSQL {
+			if statement.Start > 0 {
+				fmt.Fprintf(&buf, "OFFSET %v ROWS FETCH FETCH NEXT %v ROWS ONLY", statement.Start, statement.LimitN)
+			}
+		}
 		if dialect.DBType() != core.MSSQL && dialect.DBType() != core.ORACLE {
 			if statement.Start > 0 {
 				fmt.Fprintf(&buf, " LIMIT %v OFFSET %v", statement.LimitN, statement.Start)
