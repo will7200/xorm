@@ -18,7 +18,8 @@ import (
 func (engine *Engine) buildConds(table *core.Table, bean interface{},
 	includeVersion bool, includeUpdated bool, includeNil bool,
 	includeAutoIncr bool, allUseBool bool, useAllCols bool, unscoped bool,
-	mustColumnMap map[string]bool, tableName, aliasName string, addedTableName bool) (builder.Cond, error) {
+	mustColumnMap map[string]bool, tableName, aliasName string, addedTableName bool,
+	searchAllColumns bool) (builder.Cond, error) {
 	var conds []builder.Cond
 	for _, col := range table.Columns() {
 		if !includeVersion && col.IsVersion {
@@ -227,6 +228,8 @@ func (engine *Engine) buildConds(table *core.Table, bean interface{},
 
 		conds = append(conds, builder.Eq{colName: val})
 	}
-
+	if searchAllColumns {
+		return builder.Or(conds...), nil
+	}
 	return builder.And(conds...), nil
 }

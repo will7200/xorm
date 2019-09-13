@@ -42,6 +42,7 @@ type Statement struct {
 	UseCache        bool
 	UseAutoTime     bool
 	noAutoCondition bool
+	searchAllCols   bool
 	IsDistinct      bool
 	IsForUpdate     bool
 	TableAlias      string
@@ -908,7 +909,7 @@ func (statement *Statement) genAddColumnStr(col *core.Column) (string, []interfa
 
 func (statement *Statement) buildConds(table *core.Table, bean interface{}, includeVersion bool, includeUpdated bool, includeNil bool, includeAutoIncr bool, addedTableName bool) (builder.Cond, error) {
 	return statement.Engine.buildConds(table, bean, includeVersion, includeUpdated, includeNil, includeAutoIncr, statement.allUseBool, statement.useAllCols,
-		statement.unscoped, statement.mustColumnMap, statement.TableName(), statement.TableAlias, addedTableName)
+		statement.unscoped, statement.mustColumnMap, statement.TableName(), statement.TableAlias, addedTableName, statement.searchAllCols)
 }
 
 func (statement *Statement) mergeConds(bean interface{}) error {

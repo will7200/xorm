@@ -39,6 +39,12 @@ func (session *Session) Or(query interface{}, args ...interface{}) *Session {
 	return session
 }
 
+// QueryAll searches all columns provided
+func (session *Session) SearchAllFields(cond bool) *Session {
+	session.statement.searchAllCols = cond
+	return session
+}
+
 // Id provides converting id as a query condition
 //
 // Deprecated: use ID instead
