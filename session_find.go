@@ -186,6 +186,7 @@ func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{})
 			!session.statement.IsDistinct &&
 			!session.statement.unscoped {
 			err = session.cacheFind(sliceElementType, sqlStr, rowsSlicePtr, args...)
+			fmt.Println(err)
 			if err != ErrCacheFailed {
 				return err
 			}
