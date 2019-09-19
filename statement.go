@@ -1181,7 +1181,7 @@ func (statement *Statement) convertIDSQL(sqlStr string) string {
 		}
 
 		var top string
-		if statement.LimitN > 0 && statement.Engine.dialect.DBType() == core.MSSQL {
+		if statement.LimitN > 0 && statement.Start == 0 && statement.Engine.dialect.DBType() == core.MSSQL {
 			top = fmt.Sprintf("TOP %d ", statement.LimitN)
 		}
 
